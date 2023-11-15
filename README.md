@@ -9,7 +9,142 @@ Arif Nugraha Santosa | 5025211048
 Link: 
 
 ## 🟩🟩 IP ADDRESS KELOMPOK D08 🟩🟩 
+Node Aura (Dynamic)
+```
+auto eth0
+iface eth0 inet dhcp
 
+auto eth1
+iface eth1 inet static
+	address 192.195.1.195
+	netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+	address 192.195.2.195
+	netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+	address 192.195.3.195
+	netmask 255.255.255.0
+
+auto eth4
+iface eth4 inet static
+	address 192.195.4.195
+	netmask 255.255.255.0
+```
+Node Sein (Dynamic)
+```
+auto eth0
+iface eth0 inet dhcp
+```
+Node Stark (Dynamic)
+```
+auto eth0
+iface eth0 inet dhcp
+```
+Node Frieren (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.4.1
+netmask 255.255.255.0
+gateway 192.195.4.195
+```
+
+Node Flamme (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.4.2
+netmask 255.255.255.0
+gateway 192.195.4.195
+```
+Node Fern (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.4.3
+netmask 255.255.255.0
+gateway 192.195.4.195
+```
+Node Himmel (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.1.1
+netmask 255.255.255.0
+gateway 192.195.1.195
+```
+Node Heiter (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.1.2
+netmask 255.255.255.0
+gateway 192.195.1.195
+```
+Node Denken (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.2.1
+netmask 255.255.255.0
+gateway 192.195.2.195
+```
+Node Eisen (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.2.2
+netmask 255.255.255.0
+gateway 192.195.2.195
+```
+Node Revolte (Dynamic)
+```
+auto eth0
+iface eth0 inet dhcp
+```
+Node Richter (Dynamic)
+```
+auto eth0
+iface eth0 inet dhcp
+```
+Node Lawine (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.3.1
+netmask 255.255.255.0
+gateway 192.195.3.195
+```
+Node Linie (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.3.2
+netmask 255.255.255.0
+gateway 192.195.3.195
+```
+Node Lugner (Static)
+```
+# Static config for eth0
+auto eth0
+iface eth0 inet static	
+address 192.195.3.3
+netmask 255.255.255.0
+gateway 192.195.3.195
+```
 
 ## 🟩🟩 PENYELESAIAN 🟩🟩
 
