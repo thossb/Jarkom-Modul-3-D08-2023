@@ -159,6 +159,16 @@ gateway 192.195.3.195
 Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix IP].3.32 dan [prefix IP].3.64 - [prefix IP].3.80 (2)
 ### 🟢 Jawaban Nomor 2
 ### 2️⃣ 
+- set up dhcp server
+- Pada Himmel, koneksikan nameservernya kepada router.
+- pada Himmel lakukan `apt-get update`
+- Install isc-dhcp-server di Westalis. `apt-get install isc-dhcp-server -y`
+- Pastikan isc-dhcp-server telah ter-install dengan perintah.`dhcpd --version`
+#### Konfigurasi DHCP Server
+- Buka File Konfigurasi Interface Silakan edit file konfigurasi `isc-dhcp-server` pada `/etc/default/isc-dhcp-server.`
+- Dan isi INTERFACESv4nya dengan interface yang ingin diberi dhcp.
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/8b00dbfa-c752-4e28-a1dc-cb1f2e1b4985)
+- 
 
 ### ⭕ Nomor 3
 Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
@@ -263,3 +273,26 @@ sebanyak tiga percobaan dan lakukan testing sebanyak 100 request dengan 10 reque
 Nampaknya hanya menggunakan PHP-FPM tidak cukup untuk meningkatkan performa dari worker maka implementasikan Least-Conn pada Eisen. Untuk testing kinerja dari worker tersebut dilakukan sebanyak 100 request dengan 10 request/second. (20)
 ### 🟢 Jawaban Nomor 20
 ### 2️⃣0️⃣ 
+
+### Backup
+DHCP Server
+```
+mkdir /root/etc
+
+cp -rf /etc/default /root/etc
+cp -rf /etc/dhcp /root/etc
+```
+DHCP Relay
+```
+mkdir /root/etc
+
+cp -rf /etc/default /root/etc
+cp -r /etc/sysctl.conf /root/etc
+```
+DNS Server
+```
+mkdir /root/etc
+
+cp -rf /etc/bind /root/etc
+```
+
