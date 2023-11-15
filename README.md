@@ -168,7 +168,34 @@ Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix
 - Buka File Konfigurasi Interface Silakan edit file konfigurasi `isc-dhcp-server` pada `/etc/default/isc-dhcp-server.`
 - Dan isi INTERFACESv4nya dengan interface yang ingin diberi dhcp.
 ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/8b00dbfa-c752-4e28-a1dc-cb1f2e1b4985)
-- 
+- Edit file konfigurasi `isc-dhcp-server` pada `nano /etc/dhcp/dhcpd.conf`
+- Tambahkan script Konfigurasi
+```
+subnet 192.195.1.0 netmask 255.255.255.0 {
+}
+subnet 192.195.2.0 netmask 255.255.255.0 {
+}
+subnet 192.195.3.0 netmask 255.255.255.0 {
+    range 192.195.3.16 192.195.3.32;
+    range 192.195.3.64 192.195.3.80;
+    option routers 192.195.3.1;
+    option broadcast-address 192.195.3.255;
+    option domain-name-servers 192.195.1.3;
+    default-lease-time 180;
+    max-lease-time 5760;
+}
+subnet 192.195.4.0 netmask 255.255.255.0 {
+    range 192.195.4.12 192.195.4.20;
+    range 192.195.4.160 192.195.4.168;
+    option routers 192.195.4.1;
+    option broadcast-address 192.195.4.255;
+    option domain-name-servers 192.195.1.3;
+    default-lease-time 720;
+    max-lease-time 5760;
+}
+```
+- Restart Service `isc-dhcp-server` Dengan Perintah `service isc-dhcp-server restart`
+- Test dengan cara :
 
 ### ⭕ Nomor 3
 Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
