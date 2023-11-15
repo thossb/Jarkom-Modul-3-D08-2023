@@ -44,33 +44,25 @@ Node Stark (Dynamic)
 auto eth0
 iface eth0 inet dhcp
 ```
-Node Frieren (Static)
+Node Frieren (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.4.1
-netmask 255.255.255.0
-gateway 192.195.4.195
+iface eth0 inet dhcp
+hwaddress ether 62:85:dc:12:6a:e1 //hwaddress eth0
 ```
 
-Node Flamme (Static)
+Node Flamme (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.4.2
-netmask 255.255.255.0
-gateway 192.195.4.195
+iface eth0 inet dhcp
+hwaddress ether 0a:c9:e8:93:9a:99 //hwaddress eth0
+
 ```
-Node Fern (Static)
+Node Fern (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.4.3
-netmask 255.255.255.0
-gateway 192.195.4.195
+iface eth0 inet dhcp
+hwaddress ether 56:68:5d:5c:05:38 //hwaddress eth0
 ```
 Node Himmel (Static)
 ```
@@ -90,23 +82,17 @@ address 192.195.1.2
 netmask 255.255.255.0
 gateway 192.195.1.195
 ```
-Node Denken (Static)
+Node Denken (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.2.1
-netmask 255.255.255.0
-gateway 192.195.2.195
+iface eth0 inet dhcp
+hwaddress ether d2:5b:49:77:c6:53
 ```
-Node Eisen (Static)
+Node Eisen (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.2.2
-netmask 255.255.255.0
-gateway 192.195.2.195
+iface eth0 inet dhcp
+hwaddress ether 2e:14:fa:49:d4:26
 ```
 Node Revolte (Dynamic)
 ```
@@ -118,32 +104,23 @@ Node Richter (Dynamic)
 auto eth0
 iface eth0 inet dhcp
 ```
-Node Lawine (Static)
+Node Lawine (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.3.1
-netmask 255.255.255.0
-gateway 192.195.3.195
+iface eth0 inet dhcp
+hwaddress ether 26:5f:26:7d:8f:93
 ```
-Node Linie (Static)
+Node Linie (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.3.2
-netmask 255.255.255.0
-gateway 192.195.3.195
+iface eth0 inet dhcp
+hwaddress ether a2:22:e8:fa:6f:3d
 ```
-Node Lugner (Static)
+Node Lugner (Fixed DHCP)
 ```
-# Static config for eth0
 auto eth0
-iface eth0 inet static	
-address 192.195.3.3
-netmask 255.255.255.0
-gateway 192.195.3.195
+iface eth0 inet dhcp
+hwaddress ether 26:88:d2:3f:d6:34
 ```
 
 ## 🟩🟩 PENYELESAIAN 🟩🟩
@@ -157,12 +134,15 @@ gateway 192.195.3.195
 - lakukan echo nameserver 192.168.122.1 > /etc/resolv.conf pada node himmel (DHCP Server) dan heiter (DNS server)
 - sedangkan node lain lakukan nameserver ke Heiter (DNS Server)
 
-### ⭕ Nomor 2
-Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix IP].3.32 dan [prefix IP].3.64 - [prefix IP].3.80 (2)
-### 🟢 Jawaban Nomor 2
+### ⭕ Nomor 2 - 5
+- Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix IP].3.32 dan [prefix IP].3.64 - [prefix IP].3.80 (2)
+- Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
+- Client mendapatkan DNS dari Heiter dan dapat terhubung dengan internet melalui DNS tersebut (4)
+- Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit (5)
+- set fixed address untuk node static (*)
+### 🟢 Jawaban Nomor 2 - 5
 ### 2️⃣ 
 - set up dhcp server
-- Pada Himmel, koneksikan nameservernya kepada router.
 - pada Himmel lakukan `apt-get update`
 - Install isc-dhcp-server di Westalis. `apt-get install isc-dhcp-server -y`
 - Pastikan isc-dhcp-server telah ter-install dengan perintah.`dhcpd --version`
@@ -173,50 +153,106 @@ Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix
 - Edit file konfigurasi `isc-dhcp-server` pada `nano /etc/dhcp/dhcpd.conf`
 - Tambahkan script Konfigurasi
 ```
+#DHCP server DNS server
 subnet 192.195.1.0 netmask 255.255.255.0 {
 }
+
+# Database server Load Balancer
 subnet 192.195.2.0 netmask 255.255.255.0 {
+    option routers 192.195.2.195;
+    option broadcast-address 192.195.2.255;
+    option domain-name-servers 192.195.1.2;
+    default-lease-time 7200;
+    max-lease-time 7200;
 }
+
+#Client Switch 3
 subnet 192.195.3.0 netmask 255.255.255.0 {
     range 192.195.3.16 192.195.3.32;
     range 192.195.3.64 192.195.3.80;
-    option routers 192.195.3.1;
+    option routers 192.195.3.195;
     option broadcast-address 192.195.3.255;
-    option domain-name-servers 192.195.1.3;
+    option domain-name-servers 192.195.1.2;
     default-lease-time 180;
     max-lease-time 5760;
 }
+
+#Client Switch 4
 subnet 192.195.4.0 netmask 255.255.255.0 {
     range 192.195.4.12 192.195.4.20;
     range 192.195.4.160 192.195.4.168;
-    option routers 192.195.4.1;
+    option routers 192.195.4.195;
     option broadcast-address 192.195.4.255;
-    option domain-name-servers 192.195.1.3;
+    option domain-name-servers 192.195.1.2;
     default-lease-time 720;
     max-lease-time 5760;
 }
+
+#Database Server
+host Denken {
+    hardware ethernet d2:5b:49:77:c6:53;
+    fixed-address 192.195.2.1;
+}
+
+#Load Balancer
+host Eisen {
+    hardware ethernet 2e:14:fa:49:d4:26;
+    fixed-address 192.195.2.2;
+}
+
+#Laravel Workers
+host Frieren {
+    hardware ethernet 62:85:dc:12:6a:e1;
+    fixed-address 192.195.4.1;
+}
+
+host Flamme {
+    hardware ethernet 0a:c9:e8:93:9a:99;
+    fixed-address 192.195.4.2;
+}
+
+host Fern {
+    hardware ethernet 56:68:5d:5c:05:38;
+    fixed-address 192.195.4.3;
+}
+
+#PHP Workers
+host Lawine {
+    hardware ethernet 26:5f:26:7d:8f:93;
+    fixed-address 192.195.3.1;
+}
+
+host Linie {
+    hardware ethernet a2:22:e8:fa:6f:3d;
+    fixed-address 192.195.3.2;
+}
+
+host Lugner {
+    hardware ethernet 26:88:d2:3f:d6:34;
+    fixed-address 192.195.3.3;
+}
 ```
 - Restart Service `isc-dhcp-server` Dengan Perintah `service isc-dhcp-server restart`
-- Test dengan cara : buka salah satu client, hasilnya
-- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1e962afe-05d6-489e-84b2-f62942c97752)
 
 #### Konfigurasi DHCP Relay
-
-
-### ⭕ Nomor 3
-Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
-### 🟢 Jawaban Nomor 3
-### 3️⃣
-
-### ⭕ Nomor 4
-Client mendapatkan DNS dari Heiter dan dapat terhubung dengan internet melalui DNS tersebut (4)
-### 🟢 Jawaban Nomor 4
-### 4️⃣ 
-
-### ⭕ Nomor 5
-Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit (5)
-### 🟢 Jawaban Nomor 5
-### 5️⃣ 
+- lakukan installasi
+```
+apt-get update
+apt-get install isc-dhcp-relay -y
+service isc-dhcp-relay start
+```
+- konfigurasi pada `isc-dhcp-relay`
+- Pada /etc/default/isc-dhcp-relay lakukan konfigurasi berikut.
+```
+SERVERS="[IP Address dari DHCP Server]"  
+INTERFACES="eth1 eth3 eth 4" // eth dhcp server, client, client
+OPTIONS=
+```
+- konfigurasi IP Forwarding
+- Pada /etc/sysctl.conf. `net.ipv4.ip_forward=1`
+- Konfigurasi tersebut digunakan untuk mengaktifkan IP Forwarding. Kemudian, `restart service isc-dhcp-relay`.
+- Test dengan cara : buka salah satu client, hasilnya
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1e962afe-05d6-489e-84b2-f62942c97752)
 
 ### ⭕ Nomor 6
 Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3. (6)
