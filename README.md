@@ -153,8 +153,9 @@ gateway 192.195.3.195
 ### 1️⃣ Membuat Topologi
 - susun topologi seperti gambar dibawah
 ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/07f3e133-e19f-4440-b047-b5bb7854ac5e)
-- set iptables iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.195.0.0/16 dan simpan di root/.bashrc
-- lakukan echo nameserver 192.168.122.1 > /etc/resolv.conf pada node himmel dan router
+- set iptables iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.195.0.0/16 pada aura (Router) dan simpan di root/.bashrc
+- lakukan echo nameserver 192.168.122.1 > /etc/resolv.conf pada node himmel (DHCP Server) dan heiter (DNS server)
+- sedangkan node lain lakukan nameserver ke Heiter (DNS Server)
 
 ### ⭕ Nomor 2
 Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix IP].3.32 dan [prefix IP].3.64 - [prefix IP].3.80 (2)
@@ -200,6 +201,7 @@ subnet 192.195.4.0 netmask 255.255.255.0 {
 - ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1e962afe-05d6-489e-84b2-f62942c97752)
 
 #### Konfigurasi DHCP Relay
+
 
 ### ⭕ Nomor 3
 Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
