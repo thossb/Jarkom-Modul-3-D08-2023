@@ -152,11 +152,11 @@ hwaddress ether 26:88:d2:3f:d6:34
 - Edit file konfigurasi `isc-dhcp-server` pada `nano /etc/dhcp/dhcpd.conf`
 - Tambahkan script Konfigurasi
 ```
-#DHCP server DNS server
+# Switch 1
 subnet 192.195.1.0 netmask 255.255.255.0 {
 }
 
-# Database server Load Balancer
+# Switch 2
 subnet 192.195.2.0 netmask 255.255.255.0 {
     option routers 192.195.2.195;
     option broadcast-address 192.195.2.255;
