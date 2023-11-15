@@ -141,7 +141,6 @@ hwaddress ether 26:88:d2:3f:d6:34
 - Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit (5)
 - set fixed address untuk node static (*)
 ### 🟢 Jawaban Nomor 2 - 5
-### 2️⃣ 
 - set up dhcp server
 - pada Himmel lakukan `apt-get update`
 - Install isc-dhcp-server di Westalis. `apt-get install isc-dhcp-server -y`
