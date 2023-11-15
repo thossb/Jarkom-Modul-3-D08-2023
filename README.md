@@ -255,7 +255,7 @@ OPTIONS=
 - Test dengan cara : buka salah satu client, hasilnya
 - ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1e962afe-05d6-489e-84b2-f62942c97752)
 
-#### set up DNS
+#### Konfigurasi DNS Server
 - instalasi bind dengan command
 ```
 apt-get update
