@@ -135,11 +135,13 @@ hwaddress ether 26:88:d2:3f:d6:34
 - sedangkan node lain lakukan nameserver ke Heiter (DNS Server)
 
 ### ⭕ Nomor 2 - 5
+- melakukan register domain berupa riegel.canyon.yyy.com untuk worker Laravel dan granz.channel.yyy.com untuk worker PHP (0) mengarah pada worker yang memiliki IP [prefix IP].x.1.
 - Client yang melalui Switch3 mendapatkan range IP dari [prefix IP].3.16 - [prefix IP].3.32 dan [prefix IP].3.64 - [prefix IP].3.80 (2)
 - Client yang melalui Switch4 mendapatkan range IP dari [prefix IP].4.12 - [prefix IP].4.20 dan [prefix IP].4.160 - [prefix IP].4.168 (3)
 - Client mendapatkan DNS dari Heiter dan dapat terhubung dengan internet melalui DNS tersebut (4)
 - Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch3 selama 3 menit sedangkan pada client yang melalui Switch4 selama 12 menit. Dengan waktu maksimal dialokasikan untuk peminjaman alamat IP selama 96 menit (5)
 - set fixed address untuk node static (*)
+
 ### 🟢 Jawaban Nomor 2 - 5
 - set up dhcp server
 - pada Himmel lakukan `apt-get update`
@@ -252,6 +254,34 @@ OPTIONS=
 - Konfigurasi tersebut digunakan untuk mengaktifkan IP Forwarding. Kemudian, `restart service isc-dhcp-relay`.
 - Test dengan cara : buka salah satu client, hasilnya
 - ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1e962afe-05d6-489e-84b2-f62942c97752)
+
+#### set up DNS
+- instalasi bind dengan command
+```
+apt-get update
+apt-get install bind9 -y
+```
+- edit `nano /etc/bind/named.conf.local`
+- buat domain baru
+```
+zone "riegel.canyon.d08.com" { 
+ type 
+ master ; 
+ file " /etc/bind/jarkom/riegel.canyon.d08.com";
+};
+ 
+ zone "granz.channel.d08.com" { 
+ type master; 
+ file "/etc/bind/jarkom/granz.channel.d08.com";
+};
+```
+- buat folder untuk menyimpan konfigurasi `mkdir /etc/bind/jarkom`
+- cp dari db.local
+```
+cp /etc/bind/db.local /etc/bind/jarkom/riegel.canyon.d08.com
+cp /etc/bind/db.local /etc/bind/jarkom/granz.channel.d08.com
+```
+- edit konfigurasi bind dengan `nano /etc/bind/jarkom/riegel.canyon.d08.com` `nano /etc/bind/jarkom/granz.channel.d08.com` arahkan pada worker laravel yang memiliki  IP [prefix IP].x.1.
 
 ### ⭕ Nomor 6
 Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3. (6)
