@@ -332,6 +332,70 @@ Lugner 1GB, 1vCPU, dan 25 GB SSD.
 aturlah agar Eisen dapat bekerja dengan maksimal, lalu lakukan testing dengan 1000 request dan 100 request/second. (7)
 ### 🟢 Jawaban Nomor 7
 ### 7️⃣ 
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu. Setelah melakukan konfigurasi diatas, sekarang lakukan konfigurasi Load Balancing pada node Eisen sebagai berikut
+- Sebelum melakukan setup soal 7. Buka kembali Node DNS Server dan arahkan domain tersebut pada IP Load Balancer Eisen
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     riegel.canyon.d08.com. root.riegel.canyon.d08.com. (
+                        2023111401      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      riegel.canyon.a09.com.
+@       IN      A       192.195.4.1     ; IP Frieren
+www     IN      CNAME   riegel.canyon.d08.com.' > /etc/bind/jarkom/riegel.canyon.d08.com
+
+echo '
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     granz.channel.d08.com. root.granz.channel.d08.com. (
+                        2023111401      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      granz.channel.d08.com.
+@       IN      A       192.195.3.1     ; IP Lawine
+www     IN      CNAME   granz.channel.d08.com.' > /etc/bind/jarkom/granz.channel.d08.com
+```
+- Lalu kembali ke node Eisen dan lakukan konfigurasi pada nginx sebagai berikut
+```
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/lb-worker
+
+echo ' upstream worker {
+    server 192.173.3.1;
+    server 192.173.3.2;
+    server 192.173.3.3;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    root /var/www/html;
+
+    location / {
+        proxy_pass http://worker;
+    }
+} ' > /etc/nginx/sites-available/lb_php
+
+ln -s /etc/nginx/sites-available/lb-worker /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+
+service nginx restart
+```
+- Setelah itu lakukan konfigurasi pada salah satu client. Disini kami melakukan konfigurasi pada client sein
+```
+ab -n 1000 -c 100 192.195.2.2/ 
+```
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/e5fe81d7-f81a-4725-a422-1c7bc4d99ea7)
 
 ### ⭕ Nomor 8
 Karena diminta untuk menuliskan grimoire, buatlah analisis hasil testing dengan 200 request dan 10 request/second masing-masing algoritma Load Balancer dengan ketentuan sebagai berikut:
@@ -341,31 +405,213 @@ C. Grafik request per second untuk masing masing algoritma.
 D. Analisis (8)
 ### 🟢 Jawaban Nomor 8
 ### 8️⃣ 
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu. Selebihnya untuk konfigurasinya sama dengan Soal 7
+- Untuk laporan grimoire nya kami membuatnya di google.docs
+- Untuk mengubah algoritmanya, kita akan memodifikasi konfigurasi lb-worker pada `/etc/nginx/sites-available`
+- Algoritma round robin
+```
+upstream worker {
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+```
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/3f212b37-58b8-4ad4-9048-b0d80346ed53)
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/20c72ba7-a363-495c-aaf7-9b04627c8a35)
+
+- Algoritma least-connection
+```
+upstream worker {
+    least_conn;
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+```
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/c1250879-f2bd-49c0-81e5-8e636641aa67)
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/c637a0e8-93b9-4e45-b26b-05a787688695)
+
+- Algoritma IP Hash
+```
+upstream worker {
+    ip_hash;
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+```
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/badc5901-3aed-4545-9df4-71c567a1227b)
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/5e9cd0f3-ce96-43d3-9e6b-5dea08135d8b)
+
+- Algoritma Generic Hash
+```
+upstream worker {
+    hash $request_uri consistent;
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+```
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/37b4acfe-ae28-4db5-a9e7-0cfd3504f140)
+![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/fe0a36ad-b664-45b4-a69a-51598545236a)
 
 ### ⭕ Nomor 9
 Dengan menggunakan algoritma Round Robin, lakukan testing dengan menggunakan 3 worker, 2 worker, dan 1 worker sebanyak 100 request dengan 10 request/second, kemudian tambahkan grafiknya pada grimoire. (9)
 ### 🟢 Jawaban Nomor 9
 ### 9️⃣ 
+- Untuk mengubah algoritmanya, kita akan memodifikasi konfigurasi lb-worker pada `/etc/nginx/sites-available`
+- dan mengurangi worker yang bisa di assign dengan mengurangi upstream worker pada Algoritma round robin
+```
+upstream worker {
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+```
+- 3 worker
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/819c3e98-cf14-4df7-8556-e1086147c030)
+- 2 worker
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/df15c71b-81e2-478f-9bfb-c2890c59c7df)
+- 1 worker
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/19184ad9-8a63-462d-a262-7616cb604bf1)
+- Grafik
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/70a9fc00-a5cf-4bea-8992-b9163ba66f87)
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/17656039-c5bd-48bc-8836-d47a723ca170)
 
 ### ⭕ Nomor 10
 Selanjutnya coba tambahkan konfigurasi autentikasi di LB dengan dengan kombinasi username: “netics” dan password: “ajkyyy”, dengan yyy merupakan kode kelompok. Terakhir simpan file “htpasswd” nya di /etc/nginx/rahasisakita/ (10)
 ### 🟢 Jawaban Nomor 10
 ### 🔟
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu. Setelah itu, lakukan beberapa konfigurasi sebagai berikut pada node eisen (load balancer)
+```
+mkdir /etc/nginx/rahasisakita
+htpasswd -c /etc/nginx/rahasisakita/htpasswd netics
+```
+- lalu masukan passwordnya `ajkd08`
+- Jika sudah memasukkan password dan re-type password. Sekarang bisa dicoba dengan menambahkan command berikut pada setup nginx. (konfigurasi di file lb-worker)
+```
+auth_basic "Restricted Content";
+auth_basic_user_file /etc/nginx/rahasisakita/htpasswd;
+```
+- Jadi, ketika kita mengakses kembali ke LB akan terdapat unauthorized sebagai berikut
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/cf62ff91-b4f3-4e55-9359-2fd56b6507e3)
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/fdf80094-6145-488b-834d-efd3619055dc)
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/47a5a493-350c-48a0-8035-dfe68a8c15e9)
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/728fd9b9-b949-4613-9ced-780eada8a03f)
 
 ### ⭕ Nomor 11
 Lalu buat untuk setiap request yang mengandung /its akan di proxy passing menuju halaman https://www.its.ac.id. (11) hint: (proxy_pass)
 ### 🟢 Jawaban Nomor 11
 ### 1️⃣1️⃣ 
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu. Setelah itu, lakukan beberapa konfigurasi tambahan pada nginx sebagai berikut (konfigurasi di file lb-worker)
+```
+    location ~ /its {
+        proxy_pass https://www.its.ac.id;
+        proxy_set_header Host www.its.ac.id;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+```
+- Maksudnya adalah ketika kita melakukan akses pada endpoint yang mengandung /its akan diarahkan oleh proxy_pass menuju https://www.its.ac.id. Jadi ketika melakukan testing pada client dengan perintah
+```
+lynx 192.195.2.2/its
+```
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/127fa497-49fc-4b4d-b6bc-e13f45512c39)
 
 ### ⭕ Nomor 12
 Selanjutnya LB ini hanya boleh diakses oleh client dengan IP [Prefix IP].3.69, [Prefix IP].3.70, [Prefix IP].4.167, dan [Prefix IP].4.168. (12)
 ### 🟢 Jawaban Nomor 12
 ### 1️⃣2️⃣ 
+- konfigurasi nginx (konfigurasi di file lb-worker) dn tambahkan
+```
+location / {
+    allow 192.173.3.69;
+    allow 192.173.3.70;
+    allow 192.173.4.167;
+    allow 192.173.4.168;
+    deny all;
+    proxy_pass http://worker;
+}
+```
+- berikut full scriptnya setelah di konfigurasi
+```
+upstream worker {
+    server 192.195.3.1;
+    server 192.195.3.2;
+    server 192.195.3.3;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    location / {
+        proxy_pass http://worker;
+        auth_basic "Restricted Content";
+        auth_basic_user_file /etc/nginx/rahasisakita/htpasswd;
+        allow 192.195.3.69;
+        allow 192.195.3.70;
+        allow 192.195.4.167;
+        allow 192.195.4.168;
+        deny all;
+    }
+
+    location ~ /its {
+        proxy_pass https://www.its.ac.id;
+        proxy_set_header Host www.its.ac.id;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+- hasilnya jika kita mencoba akses lewat ip yang belum di assign sebelumnya akan menghasilkan
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/1698960d-5d39-4374-a069-b0d53d71ce8a)
+- note, baru client sein yang kami berikan akses
 
 ### ⭕ Nomor 13
 Semua data yang diperlukan, diatur pada Denken dan harus dapat diakses oleh Frieren, Flamme, dan Fern. (13)
 ### 🟢 Jawaban Nomor 13
 ### 1️⃣3️⃣ 
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu. Setelah itu kita buka Database Server nya yaitu Denken dan lakukan konfigurasi sebagai berikut
+```
+# Db akan diakses oleh 3 worker, maka 
+echo '# This group is read both by the client and the server
+# use it for options that affect everything
+[client-server]
+
+# Import all .cnf files from configuration directory
+!includedir /etc/mysql/conf.d/
+!includedir /etc/mysql/mariadb.conf.d/
+
+# Options affecting the MySQL server (mysqld)
+[mysqld]
+skip-networking=0
+skip-bind-address
+' > /etc/mysql/my.cnf
+```
+- Lalu jangan lupa untuk mengganti [bind-address] pada file /etc/mysql/mariadb.conf.d/50-server.cnf menjadi 0.0.0.0
+```
+cd /etc/mysql/mariadb.conf.d/50-server.cnf
+
+# Changes
+bind-address            = 0.0.0.0
+```
+- jangan lupa `service mysql restart`
+- setelah itu jalankan perintah berikut
+```
+mysql -u root -p
+
+CREATE USER 'kelompokd08'@'%' IDENTIFIED BY 'passwordd08';
+CREATE USER 'kelompokd08'@'localhost' IDENTIFIED BY 'passwordd08';
+CREATE DATABASE dbkelompokd08;
+GRANT ALL PRIVILEGES ON *.* TO 'kelompokd08'@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'kelompokd08'@'localhost';
+FLUSH PRIVILEGES;
+```
+- hasilnya jika kita melakukan command shell `mariadb --host=192.195.2.1 --port=3306 --user=kelompokd08 --password=passwordd08 dbkelompokd08 -e "SHOW DATABASES;"`
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/2b5bfa86-04e8-44ea-89a5-960da5199dd2)
 
 ### ⭕ Nomor 14
 Frieren, Flamme, dan Fern memiliki Granz Channel sesuai dengan quest guide berikut. Jangan lupa melakukan instalasi PHP8.0 dan Composer (14)
@@ -377,6 +623,7 @@ Granz Channel memiliki beberapa endpoint yang harus ditesting sebanyak 100 reque
 POST /auth/register (15)
 ### 🟢 Jawaban Nomor 15
 ### 1️⃣5️⃣ 
+- 
 
 ### ⭕ Nomor 16
 POST /auth/login (16)
