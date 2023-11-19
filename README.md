@@ -287,6 +287,42 @@ cp /etc/bind/db.local /etc/bind/jarkom/granz.channel.d08.com
 Pada masing-masing worker PHP, lakukan konfigurasi virtual host untuk website berikut dengan menggunakan php 7.3. (6)
 ### 🟢 Jawaban Nomor 6
 ### 6️⃣
+- Sebelum mengerjakan perlu untuk melakukan setup terlebih dahulu pada seluruh PHP Worker. Jika sudah, silahkan untuk melakukan konfigurasi tambahan sebagai berikut untuk melakukan download dan unzip menggunakan command wget
+```
+wget -O '/var/www/granz.channel.d08.com' 'https://drive.google.com/u/0/uc?id=1ViSkRq7SmwZgdK64eRbr5Fm1EGCTPrU1&export=download'
+unzip -o /var/www/granz.channel.d08.com -d /var/www/
+rm /var/www/granz.channel.d08.com
+mv /var/www/modul-3 /var/www/granz.channel.d08.com
+```
+- Setelah melakukan download dan unzip. Sekarang kita bisa melakukan konfigurasi pada nginx sebagai berikut:
+```
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/granz.channel.d08.com
+ln -s /etc/nginx/sites-available/granz.channel.d08.com /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+
+echo 'server {
+    listen 80;
+    server_name _;
+
+    root /var/www/granz.channel.d08.com;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.3-fpm.sock;  # Sesuaikan versi PHP dan socket
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}' > /etc/nginx/sites-available/granz.channel.d08.com
+
+service nginx restart
+```
+- hasil
+- ![image](https://github.com/thossb/Jarkom-Modul-3-D08-2023/assets/90438426/bbb12468-a7dd-45fa-9c79-5e5eb8734e05)
+
 
 ### ⭕ Nomor 7
 Kepala suku dari Bredt Region memberikan resource server sebagai berikut:
